@@ -1,0 +1,191 @@
+\documentclass[fontsize=11pt]{article}
+\usepackage{amsmath}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=0.75in]{geometry}
+
+\title{CSC110 Project: COVID-19's Impact on Canadian Businesses}
+\author{Patrick Fidler and Bara Kharseh}
+\date{Friday, November 5, 2021}
+
+\begin{document}
+    \maketitle
+
+    \section*{Problem Description and Research Question}
+
+    When the pandemic hit, the majority of businesses either were not able to operate or had to make large adjustments to their operations to continue to survive and avoid bankruptcy. Many businesses were forced to change how they deal with their staff, with prime examples being reducing wages and shift hours, laying off workers, and delaying pay. As the pandemic progressed, some of these businesses slowly began to recover, while others had to take even further measures to stay afloat. Illustrating the recovery (or lack thereof) of Canada's businesses is vital to understanding their health, which leads us to our research question:
+    \\
+    \\
+    \textbf{How can we represent the inclines and declines regarding staffing actions of Canadian businesses during COVID-19? What can this representation show us?}
+    \\
+    \\
+    We have chosen this research question because it allows us to visualize (by many metrics, explained in our computational overview) how businesses in Canada have weathered the pandemic. By comparing early pandemic staffing actions (April 29th) to staffing actions a few months later (July 14th), we can visualize exactly how staff were affected in the pandemic months, and make predictions on how the businesses are doing on the way. We can also deduce which industries were hit harder and had to go to more extreme measures to adapt to the havoc of the pandemic. Not only that, but by researching how businesses adapted, we can discover which had the biggest difficulties and which had the best outcomes. An example of this is the tech industry; many businesses within the tech industry thrived during the pandemic because people were ordered to stay at home, where they were more likely to use technology.
+
+    \section*{Dataset Descriptions}
+
+    Dataset 1: initial\_staffing\_data
+    \\
+    The data in this dataset comes from the government of Canada, from their website Statistics Canada, and is in csv format.
+    \\
+    Data contained within the dataset is the percentages of canadian businesses that took a specific staffing action prior to April 29th, 2020 due to COVID-19. This data is split into subsets: businesses in certain provinces or territories in Canada, businesses in certain industries, and businesses with a certain number of employees.
+    \\
+    The types of staffing actions are: reduced/increased staff hours or shifts, reduced/increased/frozen/delayed salaries or wages, hired staff, and laid off staff.
+    \\
+    We used all parts of this dataset in our program.
+    \\
+    \\
+    Dataset 2: change\_staffing\_data
+    \\
+    The data in this dataset comes from the government of Canada, from their website Statistics Canada, and is in csv format.
+    \\
+    Data contained within the dataset is the percentages of canadian businesses that took a specific staffing action prior to July 14th, 2020 due to COVID-19. This data is split into subsets: businesses in certain provinces or territories in Canada, businesses in certain industries, and businesses with a certain number of employees.
+    \\
+    The types of staffing actions are: reduced/increased staff hours or shifts, reduced/increased/frozen/delayed salaries or wages, hired staff, and laid off staff.
+    \\
+    We used all parts of this dataset in our program.
+    \\
+    \\
+    Dataset 3: heatscale
+    \\
+    The data in this dataset comes from computations done on data in the other two datasets, and is in csv format.
+    \\
+    Data contained within the dataset are "heat" values that represent the change between one value in initial\_staffing\_data and its twin value in change\_staffing\_data. For instance, if an initial percentage of businesses that hired staff was 5.0, and the change percentage was 10.0, the respective heat value would be 2.
+    \\
+    We used all parts of this dataset in our program.
+
+    \section*{Computational Overview}
+
+    Our program runs like this:
+    \\
+    \\
+    The file exctract\_data.py contains a dataclass called StaffingData, which consists of a name attribute, a type attribute (like province, industry, or size), and then an attribute for each staffing decision in our datasets initial\_staffing\_data and change\_staffing\_data.
+    \\
+    It also contains the function read\_csv\_file, which can take either of these datasets and output a list of StaffingData. There is a helper function called process\_row that takes a row and a number, then iterates through the row collecting data to help read\_csv\_file do this. Lastly, there's a helper function called find\_type that returns the "type" of a given integer, which is used in process\_row to get a string which is given to read\_csv\_file.
+    \\
+    \\
+    The file graph\_functions.py contains a function called double\_bar\_graph\_variables, which takes a string business type (like 'Industry'), a string staffing decision (like 'laid\_off\_workers'), and two lists of StaffingData, and then returns the variables necessary to create a double bar graph of the data. It iterates through each StaffingData in each list, collecting the x value and y values of the correct staffing decision where the type of StaffingData matches the given business type. A helper function str\_to\_data helps with this, taking a StaffingData and the string staffing descision and then returning the correct value in the StaffingData. double\_bar\_graph\_variables also generates the names for the axes using a similar helper function called str\_to\_names, which is a glorified way of figuring out which name should be used where. double\_bar\_graph\_variables then returns the list of x values, both the first and second lists of y values, and both axis names.
+    \\
+    \\
+    The file other\_functions.py contains two functions that miscellaneously help main.py. The first is checkbox\_array, which uses pygame to draw columns of boxes after receiving the screen on which to draw, an x and a y value, and the number of boxes. The second is convert\_name, which takes a string from a specific group and outputs a corresponding string (this is useful for our choropleth graph, where our values depended on a related string but not the exact same one).
+    \\
+    \\
+    The file calculate\_heat.py contains the function heat\_calculator, which creates a heat value based on two percentages (an initial and a final) and a sign value. The heat value is functionally the amount you'd multiply the smaller of the two percentages by to get the other percentage, but it's negative if the initial percentage is the larger one, as this means the percentages decreased. The sign value is calculated with the helper function evaluate\_sign, which is given an string attribute (must be one of the names of the float attributes in StaffingData) and then checks if it's a positive attribute (one that would be 'good' if the percentage increased from initial to final).
+    \\
+    \\
+    The file heatscale.py uses the heat\_calculator function from the calculate\_heat.py file and applies it to each percentage in both initial\_staffing\_data.csv and change\_staffing\_data.csv, giving us the desired "heat value" for each cell in the csv file. It then puts this data into the file called heatscale.csv. This file does not need to be run (however you can if you want to, it will just rewrite was is already written in heatscale.csv), but is meant to show how we got the values that you see in heatscale.csv.
+
+
+    \section*{Instructions}
+
+    Install all Python libraries in the \texttt{requirements.txt} file.
+    \\
+    To install plotly, run \texttt{pip install plotly==5.4.0} in the terminal.
+    \\
+    To install pygame, run \texttt{pip install pygame} in the terminal.
+    \\
+    To install pandas, run \texttt{pip install pandas} in the terminal (If this doesn't work, try \texttt{pip3 install pandas} instead).
+    \\
+    \\
+    Download the necessary datasets.
+    \\
+    We've pre-processed these, so here are the links to the raw datasets we started with:
+    \\
+    https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3310023101
+    \\
+    https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3310025101
+    \\
+    \\
+    And here is the Claim ID and Claim Passcode for https://send.utoronto.ca/ to download the processed versions of our datasets:
+    \\
+    Claim ID: iwHkjYn5QYk7jBQc
+    \\
+    Claim Passcode: XHz29H7Gv5obEi63
+    \\
+    \\
+    You also need to download the .geojson file of the map of Canada. This file is included in our MarkUs submission, but can also be downloaded at this link:
+    \\
+    https://thomson.carto.com/tables/canada\_provinces/public/map
+    \\
+    \\
+    Please save these dataset files and the .geojson in the same folder as the python files.
+    \\
+    \\
+    After running main.py, you should expect to see a pop-up window titled "CSC110 Project: COVID 19's Impact on Canadian Businesses" that has "Graph Customizer" in the top left corner and various checkboxes with labels.
+    \\
+    \\
+    There are a few features to note here:
+    \\
+    Each checkbox is selectable by clicking on it. You can only have one box in each column selected at a time, and clicking on another box after one is selected in that column will unselect that box.
+    \\
+    The boxes in "Business Groupings" affect how percentages of businesses are grouped. For example, selecting "Industry" will display the change in the percentages of businesses that did (something) by industry on the graph.
+    \\
+    The boxes in "Staffing Actions" affect what the (something) that a percentage of businesses did is. For example, selecting "Laid off Staff" will display the change in the percentage of businesses that laid off staff in (some group) on the graph.
+    \\
+    Want to know if businesses in construction industry laid off more workers (by percentage of businesses) earlier in the pandemic? To find out, use the "Industry" grouping with the "Laid off workers" staffing action.
+    \\
+    When you have one box selected in both columns, the graph button will appear on the bottom left. Clicking it will open a tab containing the double bar graph of your selections. You can create as many graphs as you'd like.
+    \\
+    The last feature is the ability to graph the grouping "Province/Territory" as a choropleth map. When the Province/Territory box is selected, an additional checkbox will show up labelled "Show as Choropleth". If you click the graph button with this selected, a choropleth map with heat values for each province and the territories will be generated instead of a double bar graph.
+
+
+    \section*{Description of Changes}
+
+    Since our proposal, we made some changes based on TA feedback and discussion amongst ourselves.
+    \\
+    The largest change was to our research question, and the direction we wanted to take our project. Our proposal focused on using one set of data, and comparing those numbers with some unexplained "zero" value to show some unexplained "change". Our TA essentially told us that this made no sense, and we agreed, so we edited our approach. Now we're using two twin sets of data; one from early in the pandemic, and one from later in the pandemic, and comparing the data to illustrate the difference in staffing decisions over this period. It's far more indicative of what's actually happening to the businesses and staff, and isn't using arbitrary words with no meaning. We even have a third set of data we made based on the other two, heatscale, that indicates the difference between the percentages in a generalized way to make it easier to draw a conclusion.
+    \\
+    There was also minor changes to our description to reflect this, along with some changes to what we planned to do computationally, as we had to take values from two datasets instead of one.
+
+
+    \section*{Discussion}
+
+    We started this project by asking the questions, "How can we represent the inclines and declines regarding staffing actions of Canadian businesses during COVID-19? What can this representation show us?" One way to do so was to find two datasets, representing the same data but taken at two different times. That is exactly what we did. By extracting the data from these two datasets and visualizing them through double bar graphs and choropleth maps, we were able to answer our research question effectively.
+    \\
+    The results of our program portrayed a variety of interesting data. For example, if we take a look at the choropleth map for Reduced staff hours or shifts, we would notice that a higher percentage of businesses in most provinces and territories reduced staff hours later on in the pandemic rather than earlier on. The exceptions to this are Alberta, Manitoba, New Brunswick, Nova Scotia and PEI. We can also tell that the territories suffered the most when it comes to reducing staff hours. We can apply a similar analysis to the choropleth maps of other staffing data.
+    \\
+    These analyses are not limited to the choropleth maps. The data portrayed by our double bar graphs are also very useful. For example, taking a look at the double bar graph for industries that Hired more staff, we can clearly see that a higher percentage of businesses in the retail trade industry hired more staff later on in the pandemic rather than earlier on. Health care and social assistance as well as Accommodation and food services were neck and neck for the percentage of businesses that hired more staff later on in the pandemic.
+    \\
+    All of these analyses seem to make sense as well. It is clear as to why the Health care industry would want to hire more staff or why so many provinces would want to reduce staff hours during the pandemic. Of course there are outliers, but this just makes our data seem more natural.
+    \\
+    \\
+    We experienced a few limitations when using our datasets and libraries. For example, the original datasets groups the data for all three territories into one row and names it "Territories". However, when making our choropleth maps, we needed each territory to be separate so as to assign a particular colour to each one. This required some processing to our datasets to make them easier to use. A limitation that we found with the plotly library was not being able to portray the initial and change percentage as hover data on each province in our choropleth map, as they came from different datasets than the dataframe we used when displaying our colours. Other obstacles we experienced include learning how to represent data using a double bar graph and choropleth maps with plotly as well as learning how to incorporate syntax we have not seen before with syntax we already know.
+    \\
+    \\
+    Some next steps for further exploration include visualizing the "Size" business category in a unique way, different from a double bar graph as we had already used that data visualization for the "Industry" business category. We can also look into customizing the double bar graph even more.
+    \\
+    \\
+    In conclusion, we had a lot of fun working on this project together. We were introduced to new ways of visualizing data from official datasets taken from Statistics Canada and we implemented this into our own datasets. We applied the knowledge we learned from CSC110 into this project as well, which showed us ways that we can use our knowledge from the course in the "real world". Thank you!
+
+
+    \section*{References}
+
+    Statistics Canada. Table 33-10-0231-01  Staffing actions taken by businesses during the COVID-19 pandemic, by business characteristics.
+    (March 29, 2020). Retrieved December 9, 2021, from
+    \\
+    https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3310023101
+    \\
+    \\
+    Statistics Canada. Table 33-10-0251-01  Staffing actions taken by businesses to adapt to the COVID-19 pandemic, by business characteristics.
+    (July 14, 2020). Retrieved December 9, 2021, from
+    \\
+    https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3310025101
+    \\
+    \\
+    Pygame front page. Pygame Front Page - pygame v2.0.1.dev1 documentation. (n.d.). Retrieved November 4, 2021, from https://www.pygame.org/docs/
+    \\
+    \\
+    Indian Pythonista. (2020, July 19). Plotting Choropleth Maps using Python (Plotly) [Video]. YouTube.
+    \\
+    https://www.youtube.com/watch?v=aJmaw3QKMvk&ab\_channel=IndianPythonista
+    \\
+    \\
+    Thomson, A. (2015). Canada provinces. CARTO. Retrieved December 13, 2021, from
+    \\https://thomson.carto.com/tables/canada\_provinces/public/map
+    \\
+    \\
+    Plotlygraphs. (2019, July 3). Mapbox County choropleth. Mapbox County Choropleth. Retrieved December 13, 2021, from https://plotly.com/python/mapbox-county-choropleth/.
+    \\
+    \\
+    Plotlygraphs. (2019, July 3). Bar charts. Bar Charts. Retrieved December 13, 2021, from https://plotly.com/python/bar-charts/.
+
+\end{document}
+
