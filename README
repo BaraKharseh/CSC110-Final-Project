@@ -1,0 +1,12 @@
+Final project for CSC110 (Foundations of Computer Science I). This project is made in Python, utilizing pandas and plotly.
+
+To run the project, please follow the set-up instructions in `project_report.tex`, found under "Instructions".
+
+This project visualizes the change between two groups of worker data (particularly staffing descisions) gathered by the government of Canada on different times during
+the COVID-19 pandemic. This change is displayed either graphically or on a choropleth map of the country.
+
+Our datasets are divided into various categories by statistic and region. The data from the earlier date is compared to the later using multiple algorithms. When 
+visualized, blue represents a positive change, and red represents a negative one, with stronger tones indicating a stronger directional increase in change.
+
+The user controls exactly which type of comparison is shown (ex. number of businesses that laid off staff) and how it is grouped (by province/territory, by industry, 
+or by size). If choosing provinces/territories, they also have option to display the comparison on a choropleth map instead of a double bar graph.
